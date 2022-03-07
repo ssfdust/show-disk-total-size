@@ -25,12 +25,9 @@ fn list_disks() -> io::Result<Vec<String>> {
                 Ok(line) => {
                     let mut fields = line.split_whitespace();
                     match nth!(fields, 2).and_then(|name| match name {
-                        name if name.contains("sr")
-                            || name.contains("scd")
-                            || name.contains("hdc") =>
-                        {
-                            Ok(None)
-                        }
+                        name if name.contains("sr") => Ok(None),
+                        name if name.contains("scd") => Ok(None),
+                        name if name.contains("hdc") => Ok(None),
                         name if Path::new(&format!(
                             "/sys/block/{}/device",
                             name.replace("/", "!")
@@ -76,10 +73,7 @@ fn main() {
             })
             .fold(0, |acc, x| acc + x))
     }) {
-        Ok(total_size) => println!(
-            "{:.1}",
-            total_size as f64 / 1024.0 / 1024.0 / 1024.0
-        ),
+        Ok(total_size) => println!("{:.1}", total_size as f64 / 1024.0 / 1024.0 / 1024.0),
         _ => println!("Failed to get disk size."),
     }
 }
