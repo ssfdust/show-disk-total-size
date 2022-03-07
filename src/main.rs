@@ -24,25 +24,26 @@ fn list_disks() -> io::Result<Vec<String>> {
             .filter_map(|line_in| match line_in {
                 Ok(line) => {
                     let mut fields = line.split_whitespace();
-                    nth!(fields, 2)
-                        .and_then(|name| match name {
-                            name if name.contains("sr")
-                                || name.contains("scd")
-                                || name.contains("hdc") =>
-                            {
-                                Ok(None)
-                            }
-                            name if Path::new(&format!(
-                                "/sys/block/{}/device",
-                                name.replace("/", "!")
-                            ))
-                            .exists() =>
-                            {
-                                Ok(Some(name.to_owned()))
-                            }
-                            _ => Ok(None),
-                        })
-                        .unwrap()
+                    match nth!(fields, 2).and_then(|name| match name {
+                        name if name.contains("sr")
+                            || name.contains("scd")
+                            || name.contains("hdc") =>
+                        {
+                            Ok(None)
+                        }
+                        name if Path::new(&format!(
+                            "/sys/block/{}/device",
+                            name.replace("/", "!")
+                        ))
+                        .exists() =>
+                        {
+                            Ok(Some(name.to_owned()))
+                        }
+                        _ => Ok(None),
+                    }) {
+                        Ok(Some(val)) => Some(val),
+                        _ => None,
+                    }
                 }
                 _ => None,
             })
