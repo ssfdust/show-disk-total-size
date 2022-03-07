@@ -19,7 +19,7 @@ macro_rules! nth {
 fn list_disks() -> io::Result<Vec<String>> {
     File::open("/proc/diskstats").and_then(|file_in| {
         let file_reader = BufReader::with_capacity(2048, file_in);
-        let disks = file_reader
+        Ok(file_reader
             .lines()
             .filter_map(|line_in| match line_in {
                 Ok(line) => {
@@ -46,8 +46,7 @@ fn list_disks() -> io::Result<Vec<String>> {
                 }
                 _ => None,
             })
-            .collect::<Vec<String>>();
-        Ok(disks)
+            .collect::<Vec<String>>())
     })
 }
 
@@ -76,7 +75,10 @@ fn main() {
             })
             .fold(0, |acc, x| acc + x))
     }) {
-        Ok(total_size) => println!("{} Gib", total_size),
+        Ok(total_size) => println!(
+            "Total Size: {:.1} Gib",
+            total_size as f64 / 1024.0 / 1024.0 / 1024.0
+        ),
         _ => println!("Failed to get disk size."),
     }
 }
