@@ -77,7 +77,7 @@ fn main() {
             .fold(0, |acc, x| acc + x))
     }) {
         Ok(total_size) => println!(
-            "Total Size: {:.1} Gib",
+            "{:.1}",
             total_size as f64 / 1024.0 / 1024.0 / 1024.0
         ),
         _ => println!("Failed to get disk size."),
