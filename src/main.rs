@@ -21,11 +21,10 @@ fn is_not_cdrom(disk_name: &str) -> bool {
 }
 
 fn is_physical_device(disk_name: &str) -> bool {
-    let device_path = Path::new(&format!(
+    Path::new(&format!(
         "/sys/block/{}/device",
         disk_name.replace("/", "!")
-    ));
-    device_path.exists() && is_not_cdrom(disk_name)
+    )).exists() && is_not_cdrom(disk_name)
 }
 
 fn list_disks() -> io::Result<Vec<String>> {
@@ -76,7 +75,10 @@ fn get_disk_total_size() -> io::Result<i64> {
 
 fn main() {
     match get_disk_total_size() {
-        Ok(total_size) => println!("{}", total_size),
+        Ok(total_size) => {
+            let total_size_in_gib = total_size as f64 / 1024.0 / 1024.0 / 1024.0;
+            println!("{:.1}", total_size_in_gib)
+        },
         _ => println!("Failed to get disk size.")
     }
 }
